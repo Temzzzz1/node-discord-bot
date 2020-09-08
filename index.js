@@ -1,17 +1,18 @@
+const fs = require('fs');
 const Discord = require('discord.js');
 const { prefix, token } = require('./config.json');
-const fs = require('fs');
+
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
-const cooldowns = new Discord.Collection();
 
-// Загружаем с директории все команды
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
 for (const file of commandFiles) {
 	const command = require(`./commands/${file}`);
 	client.commands.set(command.name, command);
 }
+
+const cooldowns = new Discord.Collection();
 
 // Логинемся
 client.on('ready', () => {
@@ -20,7 +21,6 @@ client.on('ready', () => {
 
 client.on('message', message => {
 
-    console.log(message.content);
 
     // Проверяем сообщения с префиксом
 	if (!message.content.startsWith(prefix) || message.author.bot) return;
@@ -28,7 +28,9 @@ client.on('message', message => {
 
     // Дополнительные штуки для удобной работы с аргументами команд
 	const args = message.content.slice(prefix.length).trim().split(/ +/);
-	const commandName = args.shift().toLowerCase();
+    const commandName = args.shift().toLowerCase();
+    
+    console.log(args);
 
     // Проверяем и подключаем команду с директории
 	const command = client.commands.get(commandName)
